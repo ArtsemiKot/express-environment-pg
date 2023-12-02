@@ -1,46 +1,48 @@
 const express = require('express');
 const { getAllEnvironment, getEnvironmentByID, createEnvironment, updateEnvironment, deleteEnvironment } = require('../service/environment.service')
 const route = express.Router();
+const {buildResponse} = require('../helper/bildResponce')
+const {isValidEnvironmentId, isValidBody} = require('../helper/validation')
 
 route.get('/', async (req, res) => {
     const data = await getAllEnvironment();
-    res.send(data);
+    buildResponse(res, 200, data);
 })
-route.get('/:id', async (req, res) => {
+route.get('/:id',isValidEnvironmentId, async (req, res) => {
     const { id } = req.params;
     const data = await getEnvironmentByID(id);
-    res.send(data);
+    buildResponse(res, 200, data);
 })
 
-route.post('/', async (req, res) => {
+route.post('/', isValidEnvironmentId, isValidBody, async (req, res) => {
     try {
         const { label, category, priority } = req.body;
         const data = await createEnvironment(label, category, priority);
-        res.send(data);
+        buildResponse(res, 200, data);
     } catch (error) {
-        res.send(error.message)
+        buildResponse(res, 404, error.message);
     }
 
 })
 
-route.put('/:id', async (req, res) => {
+route.put('/:id',isValidEnvironmentId, isValidBody, async (req, res) => {
     try {
         const { id } = req.params;
         const { label, category, priority } = req.body;
         const data = await updateEnvironment(id, label, category, priority);
-        res.send(data);
+        buildResponse(res, 200, data);
     } catch (error) {
-        res.send(error.message);
+        buildResponse(res, 404, error.message);
     }
 })
 
-route.delete('/:id', async (req, res) => {
+route.delete('/:id', isValidEnvironmentId, async (req, res) => {
     try {
         const { id } = req.params;
         const data = await deleteEnvironment(id);
-        res.send(data);
+        buildResponse(res, 200, data);
     } catch (error) {
-        res.send(error.message);
+        buildResponse(res, 404, error.message);
     }
 })
 
